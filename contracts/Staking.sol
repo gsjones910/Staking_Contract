@@ -13,7 +13,7 @@ contract Staking is Ownable {
 
     uint private rewardRate = 100; // reward rates
 
-    uint private withdrawFee = 10; // withdraw fees
+    uint private withdrawFee = 5; // withdraw fees
     bool private withdrawFeeStatus = true; // enable/disable withdraw fees
 
     uint public lastUpdateTime;
@@ -115,12 +115,10 @@ contract Staking is Ownable {
         require(_balances[msg.sender] >= _amount, "Over the limit");
         require(address(this).balance >= _amount, "Insufficient amount");
         uint realAmount = _amount;
-        // if (withdrawFeeStatus) {
-        //     realAmount = _amount.mul(100 - withdrawFee).div(100);
-        // }
-
+        if (withdrawFeeStatus) {
+            realAmount = _amount.mul(100 - withdrawFee).div(100);
+        }
         payable(msg.sender).transfer(realAmount);
-
         _totalSupply = _totalSupply.sub(realAmount);
         _balances[msg.sender] = _balances[msg.sender].sub(_amount);
         emit Withdraw(msg.sender, _amount, _balances[msg.sender]);
